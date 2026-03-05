@@ -4,6 +4,9 @@ import uuid
 import time
 from flask_session import Session
 from icecream import ic
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
+
 ic.configureOutput(prefix=f'----- | ', includeContext=True)
  
 app = Flask(__name__)
@@ -16,7 +19,7 @@ Session(app)
 def show_signup():
     try:
         user = session.get("user", "")
-        return render_template("page_signup.html", user=user)
+        return render_template("page_signup.html", user=user, x=x)
     except Exception as ex:
         ic(ex)
         return "ups"
@@ -27,19 +30,53 @@ def api_create_user():
     try:
         user_first_name = x.validate_user_first_name()
         user_last_name = x.validate_user_last_name()
+        user_email = x.validate_user_email()
+        user_password = x.validate_user_password()
+        user_hashed_password = generate_password_hash(user_password)
+        # ic(user_hashed_password) # 'scrypt:32768:8:1$Z32qyk6PTuLpgOqf$bbd9446a2d2853af0cb9ca2fc271b5cf80effac46c502415425a7f3a84c2b80234df9aac9f05a592d2c60e1befda8d001c19b3ceee4d0e586266e48c08dc5b7d'
+
+        user_pk = uuid.uuid4().hex
+        user_create_at = int(time.time())
+
+        db, cursor = x.db()
+        q = "INSERT INTO users VALUES(%s, %s, %s, %s, %s, %s)"
+        cursor.execute(q, (user_pk, user_first_name, user_last_name, user_email, user_hashed_password, user_create_at))
+        db.commit()
+
+        return f"""<browser mix-redirect="/login"></browser>"""
+    
     except Exception as ex:
         ic(ex)
         if "company_exception user_first_name" in str(ex):
-            error_message = f"user_first_name {x.USER_FIRST_NAME_MIN} to {x.USER_FIRST_NAME_MAX} characters"
+            error_message = f"user first name {x.USER_FIRST_NAME_MIN} to {x.USER_FIRST_NAME_MAX} characters"
             ___tip = render_template("___tip.html", status="error", message=error_message)
-            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>"""
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
         
         if "company_exception user_last_name" in str(ex):
-            error_message = f"user_last_name {x.USER_LAST_NAME_MIN} to {x.USER_LAST_NAME_MAX} characters"
+            error_message = f"user last name {x.USER_LAST_NAME_MIN} to {x.USER_LAST_NAME_MAX} characters"
             ___tip = render_template("___tip.html", status="error", message=error_message)
-            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>"""
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
         
-        return "ups"
+        if "company_exception user_email" in str(ex):
+            error_message = f"user email invalid"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+        
+        if "company_exception user_password" in str(ex):
+            error_message = f"user password {x.USER_PASSWORD_MIN} to {x.USER_PASSWORD_MAX} characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+        
+        if "Duplicate entry" in str(ex) and "user_email" in str(ex):
+            error_message = "Email already exist"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+        
+        #Worst case
+        error_message = "System under maintenance"
+        ___tip = render_template("___tip.html", status="error", message=error_message)
+        return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 500
+        
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()

@@ -1,0 +1,16 @@
+{% include "_header.html" %}
+
+<main>
+    <form mix-post="/api-create-user" autocomplete="off">
+        <input name="user_first_name" type="text" placeholder="user first name" value="Bent">
+        <input name="user_last_name" type="text" placeholder="user last name" value="Hansen">
+        <input name="user_email" type="text" placeholder="user email">
+        <input name="user_password" type="text" placeholder="user password">
+        <button>
+            Signup
+        </button>
+    </form>
+</main>
+
+
+{% include "_footer.html" %}

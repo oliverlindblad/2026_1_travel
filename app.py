@@ -16,6 +16,7 @@ Session(app)
 
 ##############################
 @app.get("/signup")
+@x.no_cache
 def show_signup():
     try:
         user = session.get("user", "")
@@ -43,7 +44,12 @@ def api_create_user():
         cursor.execute(q, (user_pk, user_first_name, user_last_name, user_email, user_hashed_password, user_create_at))
         db.commit()
 
-        return f"""<browser mix-redirect="/login"></browser>"""
+        form_signup = render_template("___for_signup.html", x=x)
+
+        return f"""
+            <browser mix-replace="form">{form_signup}</browser>
+            <browser mix-redirect="/login"></browser>
+        """
     
     except Exception as ex:
         ic(ex)
@@ -80,3 +86,90 @@ def api_create_user():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
+
+##############################
+@app.get("/login")
+@x.no_cache
+def show_login():
+    try:
+        user = session.get("user", "")
+        if not user:
+            return render_template("page_login.html", user=user, x=x)
+        return redirect("/profile")
+    except Exception as ex:
+        ic(ex)
+        return "ups"
+    
+
+##############################
+@app.post("/api-login")
+def api_login():
+    try:
+        user_email = x.validate_user_email()
+        user_password = x.validate_user_password()
+        # ic(user_hashed_password) # 'scrypt:32768:8:1$Z32qyk6PTuLpgOqf$bbd9446a2d2853af0cb9ca2fc271b5cf80effac46c502415425a7f3a84c2b80234df9aac9f05a592d2c60e1befda8d001c19b3ceee4d0e586266e48c08dc5b7d'
+
+        db, cursor = x.db()
+        q = "SELECT * FROM users WHERE user_email = %s"
+        cursor.execute(q, (user_email,))
+        user = cursor.fetchone()
+        if not user:
+            error_message = "Invalid credentials 1"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+        
+        if not check_password_hash(user["user_password"], user_password):
+            error_message = "Invalid credentials 2"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        user.pop("user_password")
+        session["user"] = user
+
+        return f"""<browser mix-redirect="/profile"></browser>"""
+    
+    except Exception as ex:
+        ic(ex)
+    
+        if "company_exception user_email" in str(ex):
+            error_message = f"user email invalid"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+        
+        if "company_exception user_password" in str(ex):
+            error_message = f"user password {x.USER_PASSWORD_MIN} to {x.USER_PASSWORD_MAX} characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+        
+        #Worst case
+        error_message = "System under maintenance"
+        ___tip = render_template("___tip.html", status="error", message=error_message)
+        return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 500
+        
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+##############################
+@app.get("/profile")
+@x.no_cache
+def show_profile():
+    try:
+        user = session.get("user", "")
+        if not user: return redirect("/login")
+        return render_template("page_profile.html", user=user, x=x)
+    except Exception as ex:
+        ic(ex)
+        return "ups"
+    
+##############################
+@app.get("/logout")
+def logout():
+    try:
+        session.clear()
+        return redirect ("/login")
+    except Exception as ex:
+        ic(ex)
+        return "ups"

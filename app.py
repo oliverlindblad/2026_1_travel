@@ -15,7 +15,6 @@ app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 
 
-
 ##############################
 @app.get("/signup")
 @x.no_cache
@@ -179,3 +178,14 @@ def logout():
     except Exception as ex:
         ic(ex)
         return "ups"        
+    
+
+##############################
+@app.get("/")
+def show_index():
+    try:
+        user = session.get("user", "")
+        return render_template("index.html", user=user, x=x)
+    except Exception as ex:
+        ic(ex)
+        return "ups"

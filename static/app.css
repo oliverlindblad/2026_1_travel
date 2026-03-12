@@ -135,3 +135,46 @@ footer {
     background-color: #463838;
   }
 }
+
+.profile {
+  padding: 2rem 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+
+  .profile-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+    }
+  }
+
+  .destinations-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .destination-card {
+    border: 1px solid #eeeded;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #ece6e6;
+
+    h2 {
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+.card-link {
+  color: #27385e;
+  text-decoration: none;
+  font-weight: 600;
+}

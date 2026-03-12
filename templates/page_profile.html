@@ -1,9 +1,30 @@
 {% include "_header.html" %}
 
-<main>
+<main class="profile">
 
+    <section class="profile-top">
+        <h1>My Travel Destinations</h1>
+        <a href="/create-destination" class="btn">Create New Destination</a>
+    </section>
+
+    <section class="destinations-list">
+
+        <article class="destination-card">
+            <h2>Paris</h2>
+            <p>France, Paris</p>
+            <p>2024-06-01 to 2024-06-07</p>
+            <a href="/destination/1" class="card-link">View / Edit</a>
+        </article>
+
+        <article class="destination-card">
+            <h2>Tokyo</h2>
+            <p>Japan, Tokyo</p>
+            <p>2023-09-10 to 2023-09-20</p>
+            <a href="/destination/2" class="card-link">View / Edit</a>
+        </article>
+
+    </section>
 
 </main>
-
 
 {% include "_footer.html" %}

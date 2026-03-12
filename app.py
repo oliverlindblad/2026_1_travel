@@ -167,14 +167,16 @@ def show_profile():
     except Exception as ex:
         ic(ex)
         return "ups"
-
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 ##############################
 @app.get("/logout")
 def logout():
     try:
         session.clear()
-        return redirect("/login")
+        return redirect("/")
     except Exception as ex:
         ic(ex)
         return "ups"        
@@ -186,6 +188,20 @@ def show_index():
     try:
         user = session.get("user", "")
         return render_template("index.html", user=user, x=x)
+    except Exception as ex:
+        ic(ex)
+        return "ups"
+    
+    
+##############################
+@app.get("/create-destination")
+def show_create_destination():
+    try:
+        user = session.get("user")
+        if not user:
+            return redirect("/login")
+
+        return render_template("page_create_destination.html", user=user, x=x)
     except Exception as ex:
         ic(ex)
         return "ups"

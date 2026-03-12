@@ -1,0 +1,63 @@
+{% include "_header.html" %}
+
+<main class="create-destination">
+
+    <h1>Create New Destination</h1>
+
+    <form mix-post="/api-create-destination" autocomplete="off">
+
+        <div>
+            <label for="destination_title">
+                Title
+            </label>
+            <input id="destination_title" name="destination_title" type="text" placeholder="destination title"
+                mix-validate="^.{2,100}$">
+        </div>
+
+        <div>
+            <label for="destination_country">
+                Country
+            </label>
+            <input id="destination_country" name="destination_country" type="text" placeholder="destination country"
+                mix-validate="^.{2,100}$">
+        </div>
+
+        <div>
+            <label for="destination_location">
+                Location
+            </label>
+            <input id="destination_location" name="destination_location" type="text" placeholder="destination location"
+                mix-validate="^.{2,100}$">
+        </div>
+
+        <div>
+            <label for="destination_description">
+                Description
+            </label>
+            <textarea id="destination_description" name="destination_description" placeholder="destination description"
+                mix-validate="^.{0,500}$"></textarea>
+        </div>
+
+        <div>
+            <label for="destination_date_from">
+                Date from
+            </label>
+            <input id="destination_date_from" name="destination_date_from" type="date" mix-validate="^.{10}$">
+        </div>
+
+        <div>
+            <label for="destination_date_to">
+                Date to
+            </label>
+            <input id="destination_date_to" name="destination_date_to" type="date" mix-validate="^.{10}$">
+        </div>
+
+        <button>
+            Create Destination
+        </button>
+
+    </form>
+
+</main>
+
+{% include "_footer.html" %}

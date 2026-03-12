@@ -158,15 +158,32 @@ def api_login():
 
 ##############################
 @app.get("/profile")
-@x.no_cache
 def show_profile():
     try:
-        user = session.get("user", "")
-        if not user: return redirect("/login")
-        return render_template("page_profile.html", user=user, x=x)
+        user = session.get("user")
+        if not user:
+            return redirect("/login")
+
+        db, cursor = x.db()
+        q = """
+        SELECT * FROM destinations
+        WHERE user_id = %s
+        ORDER BY destination_created_at DESC
+        """
+        cursor.execute(q, (user["user_pk"],))
+        destinations = cursor.fetchall()
+
+        return render_template(
+            "page_profile.html",
+            user=user,
+            destinations=destinations,
+            x=x
+        )
+
     except Exception as ex:
         ic(ex)
         return "ups"
+
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
@@ -192,7 +209,7 @@ def show_index():
         ic(ex)
         return "ups"
     
-    
+
 ##############################
 @app.get("/create-destination")
 def show_create_destination():
@@ -205,3 +222,73 @@ def show_create_destination():
     except Exception as ex:
         ic(ex)
         return "ups"
+    
+
+##############################
+@app.post("/api-create-destination")
+def api_create_destination():
+    try:
+        user = session.get("user")
+        if not user:
+            error_message = "You must be logged in"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        destination_title = x.validate_destination_title()
+        destination_country = x.validate_destination_country()
+        destination_location = x.validate_destination_location()
+        destination_description = x.validate_destination_description()
+        destination_date_from = x.validate_destination_date_from()
+        destination_date_to = x.validate_destination_date_to()
+
+        destination_pk = str(uuid.uuid4())
+        user_id = user["user_pk"]
+        destination_created_at = int(time.time())
+
+        db, cursor = x.db()
+        q = "INSERT INTO destinations VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(q, (destination_pk, user_id, destination_title, destination_country, destination_location, destination_description, destination_date_from, destination_date_to, destination_created_at))
+        db.commit()
+
+        return f"""<browser mix-redirect="/profile"></browser>"""
+
+    except Exception as ex:
+        ic(ex)
+
+        if "company_exception destination_title" in str(ex):
+            error_message = "Title must be between 2 and 100 characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_country" in str(ex):
+            error_message = "Country must be between 2 and 100 characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_location" in str(ex):
+            error_message = "Location must be between 2 and 100 characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_description" in str(ex):
+            error_message = "Description must be max 500 characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_date_from" in str(ex):
+            error_message = "Date from is invalid"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_date_to" in str(ex):
+            error_message = "Date to is invalid"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        error_message = "System under maintenance"
+        ___tip = render_template("___tip.html", status="error", message=error_message)
+        return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 500
+
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()

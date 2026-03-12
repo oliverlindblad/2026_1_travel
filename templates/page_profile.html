@@ -3,26 +3,26 @@
 <main class="profile">
 
     <section class="profile-top">
-        <h1>My Travel Destinations</h1>
+        <h1>{{ user.user_first_name }}'s Trips</h1>
         <a href="/create-destination" class="btn">Create New Destination</a>
     </section>
 
     <section class="destinations-list">
-
+        {% if destinations %}
+        {% for destination in destinations %}
         <article class="destination-card">
-            <h2>Paris</h2>
-            <p>France, Paris</p>
-            <p>2024-06-01 to 2024-06-07</p>
-            <a href="/destination/1" class="card-link">View / Edit</a>
+            <h2>{{ destination.destination_title }}</h2>
+            <p>{{ destination.destination_country }}, {{ destination.destination_location }}</p>
+            <p>{{ destination.destination_date_from }} to {{ destination.destination_date_to }}</p>
+            <a href="/destination/{{ destination.destination_pk }}" class="card-link">Edit</a>
         </article>
-
+        {% endfor %}
+        {% else %}
         <article class="destination-card">
-            <h2>Tokyo</h2>
-            <p>Japan, Tokyo</p>
-            <p>2023-09-10 to 2023-09-20</p>
-            <a href="/destination/2" class="card-link">View / Edit</a>
+            <h2>No destinations yet</h2>
+            <p>You have not created any travel destinations yet.</p>
         </article>
-
+        {% endif %}
     </section>
 
 </main>

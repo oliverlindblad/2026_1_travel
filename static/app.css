@@ -3,26 +3,81 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #fafafa;
+  color: #2f2f2f;
 }
+
+main {
+  width: 100%;
+}
+
 form {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
+
   div {
     display: flex;
     flex-direction: column;
-    input {
-      width: 100%;
+    gap: 0.4rem;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid #d8d1d1;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 1rem;
+    outline: none;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: #5f4c4c;
+    box-shadow: 0 0 0 3px rgba(95, 76, 76, 0.12);
+  }
+
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  button {
+    font-size: 1rem;
+    padding: 0.85rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #5f4c4c;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      background-color: #463838;
     }
   }
 }
+
 label {
   display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+
   span {
     margin-left: auto;
     color: rgb(150, 150, 150);
+    font-size: 0.9rem;
+    font-weight: 400;
   }
 }
 
@@ -35,13 +90,18 @@ label {
   display: flex;
   justify-content: center;
   pointer-events: none;
+
   span {
     padding: 1rem 2rem;
     color: white;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   }
+
   .ok {
     background: green;
   }
+
   .error {
     background: red;
   }
@@ -55,6 +115,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 0 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
   a {
     color: #fafafa;
@@ -71,15 +132,19 @@ nav {
 
 #items {
   width: 100%;
-  height: 100%;
+  min-height: calc(100vh - 3.5rem);
   display: grid;
   grid-template-columns: 10fr 4fr;
+
   #left {
+    padding: 1.5rem;
   }
+
   #right {
-    padding: 1rem;
-    border-left: 1px solid black;
-    box-shadow: 0px 0px 10px black;
+    padding: 1.5rem;
+    border-left: 1px solid #d8d1d1;
+    background-color: #f5f1f1;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
   }
 }
 
@@ -103,16 +168,20 @@ footer {
   justify-content: center;
   align-items: center;
   text-align: center;
+  padding: 2rem 1.5rem;
 
   h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
+    color: #4c3c3c;
   }
 
   p {
     font-size: 1rem;
     max-width: 600px;
     margin-bottom: 2rem;
+    line-height: 1.6;
+    color: #5a5a5a;
   }
 }
 
@@ -122,13 +191,15 @@ footer {
 }
 
 .btn {
-  font-size: 1.2rem;
-  padding: 0.8rem 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  padding: 0.8rem 1.4rem;
   background-color: #5f4c4c;
   color: white;
-  padding: 0.6rem 1.2rem;
   text-decoration: none;
-  border-radius: 5px;
+  border-radius: 6px;
   transition: 0.2s;
 
   &:hover {
@@ -137,7 +208,7 @@ footer {
 }
 
 .profile {
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 1.5rem 4rem;
   max-width: 900px;
   margin: 0 auto;
 
@@ -145,10 +216,12 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
     margin-bottom: 2rem;
 
     h1 {
       font-size: 2rem;
+      color: #4c3c3c;
     }
   }
 
@@ -158,23 +231,48 @@ footer {
   }
 
   .destination-card {
-    border: 1px solid #eeeded;
-    border-radius: 8px;
-    padding: 1rem;
+    border: 1px solid #e3dede;
+    border-radius: 10px;
+    padding: 1.25rem;
     background-color: #ece6e6;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
 
     h2 {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.6rem;
+      color: #4c3c3c;
+      font-size: 1.3rem;
     }
 
     p {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.45rem;
+      color: #4a4a4a;
+      line-height: 1.5;
     }
   }
 }
 
 .card-link {
+  display: inline-block;
+  margin-top: 0.5rem;
   color: #27385e;
   text-decoration: none;
   font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.create-destination,
+.signup,
+.login {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+
+  h1 {
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #4c3c3c;
+  }
 }

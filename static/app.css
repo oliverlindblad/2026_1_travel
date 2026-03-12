@@ -253,8 +253,7 @@ footer {
 
 .card-link {
   display: inline-block;
-  margin-top: 0.5rem;
-  color: #27385e;
+  color: #5f4c4c;
   text-decoration: none;
   font-weight: 600;
 
@@ -274,5 +273,26 @@ footer {
     margin-bottom: 2rem;
     text-align: center;
     color: #4c3c3c;
+  }
+}
+
+.card-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.btn-delete {
+  font-size: 1rem;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background-color: #ae2a2a;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    background-color: #6f2d2d;
   }
 }

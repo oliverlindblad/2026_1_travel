@@ -8,21 +8,32 @@
     </section>
 
     <section class="destinations-list">
-        {% if destinations %}
         {% for destination in destinations %}
-        <article class="destination-card">
+        <article class="destination-card" id="destination-{{ destination.destination_pk }}">
             <h2>{{ destination.destination_title }}</h2>
             <p>{{ destination.destination_country }}, {{ destination.destination_location }}</p>
             <p>{{ destination.destination_date_from }} to {{ destination.destination_date_to }}</p>
-            <a href="/destination/{{ destination.destination_pk }}" class="card-link">Edit</a>
+
+            <div class="card-actions">
+                <a href="/destination/{{ destination.destination_pk }}" class="card-link">Edit</a>
+
+                <button type="button" class="btn-delete"
+                    onclick="if(confirm('Are you sure you want to delete this destination?')) { document.getElementById('delete-{{ destination.destination_pk }}').click() }">
+                    Delete
+                </button>
+
+                <button type="button" id="delete-{{ destination.destination_pk }}" class="mix-hidden"
+                    mix-delete="/api-delete-destination/{{ destination.destination_pk }}">
+                    Hidden delete
+                </button>
+            </div>
         </article>
-        {% endfor %}
         {% else %}
         <article class="destination-card">
             <h2>No destinations yet</h2>
             <p>You have not created any travel destinations yet.</p>
         </article>
-        {% endif %}
+        {% endfor %}
     </section>
 
 </main>

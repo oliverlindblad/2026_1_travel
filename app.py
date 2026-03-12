@@ -292,3 +292,156 @@ def api_create_destination():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
+
+##############################
+@app.get("/destination/<destination_pk>")
+def show_destination(destination_pk):
+    try:
+        user = session.get("user")
+        if not user:
+            return redirect("/login")
+
+        db, cursor = x.db()
+        q = """
+        SELECT * FROM destinations
+        WHERE destination_pk = %s AND user_id = %s
+        """
+        cursor.execute(q, (destination_pk, user["user_pk"]))
+        destination = cursor.fetchone()
+
+        if not destination:
+            return "Destination not found", 400
+
+        return render_template(
+            "page_destination.html",
+            user=user,
+            destination=destination,
+            x=x
+        )
+
+    except Exception as ex:
+        ic(ex)
+        return "ups"
+
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+##############################
+@app.put("/api-update-destination/<destination_pk>")
+def api_update_destination(destination_pk):
+    try:
+        user = session.get("user")
+
+        destination_title = x.validate_destination_title()
+        destination_country = x.validate_destination_country()
+        destination_location = x.validate_destination_location()
+        destination_description = x.validate_destination_description()
+        destination_date_from = x.validate_destination_date_from()
+        destination_date_to = x.validate_destination_date_to()
+
+        db, cursor = x.db()
+
+        q = """
+        UPDATE destinations
+        SET
+            destination_title = %s,
+            destination_country = %s,
+            destination_location = %s,
+            destination_description = %s,
+            destination_date_from = %s,
+            destination_date_to = %s
+        WHERE destination_pk = %s
+        AND user_id = %s
+        LIMIT 1
+        """
+        cursor.execute(q, (
+            destination_title,
+            destination_country,
+            destination_location,
+            destination_description,
+            destination_date_from,
+            destination_date_to,
+            destination_pk,
+            user["user_pk"]
+        ))
+        db.commit()
+
+        return f"""<browser mix-redirect="/profile"></browser>"""
+
+    except Exception as ex:
+        ic(ex)
+
+        if "company_exception destination_title" in str(ex):
+            error_message = "Title must be between 2 and 100 characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_country" in str(ex):
+            error_message = "Country must be between 2 and 100 characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_location" in str(ex):
+            error_message = "Location must be between 2 and 100 characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_description" in str(ex):
+            error_message = "Description must be max 500 characters"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_date_from" in str(ex):
+            error_message = "Date from is invalid"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        if "company_exception destination_date_to" in str(ex):
+            error_message = "Date to is invalid"
+            ___tip = render_template("___tip.html", status="error", message=error_message)
+            return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 400
+
+        error_message = "System under maintenance"
+        ___tip = render_template("___tip.html", status="error", message=error_message)
+        return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 500
+
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+##############################
+@app.delete("/api-delete-destination/<destination_pk>")
+def api_delete_destination(destination_pk):
+    try:
+        user = session.get("user")
+
+        db, cursor = x.db()
+        q = """
+        DELETE FROM destinations
+        WHERE destination_pk = %s
+        AND user_id = %s
+        LIMIT 1
+        """
+        cursor.execute(q, (destination_pk, user["user_pk"]))
+        db.commit()
+
+        ___tip = render_template("___tip.html", status="ok", message="Destination deleted")
+
+        return f"""
+        <browser mix-remove="#destination-{destination_pk}"></browser>
+        <browser mix-after-begin="#tooltip">{___tip}</browser>
+        """
+
+    except Exception as ex:
+        ic(ex)
+        error_message = "System under maintenance"
+        ___tip = render_template("___tip.html", status="error", message=error_message)
+        return f"""<browser mix-after-begin="#tooltip">{___tip}</browser>""", 500
+
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
